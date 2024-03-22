@@ -1,0 +1,28 @@
+﻿<!DOCTYPE html>
+<!-- 2) указываем Главный Модуль (директивы Ангуляр) "Точка входа" -->
+<html lang="ru" ng-app="mainApp">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AngularJS</title>
+    <!-- 1) подключ 1 скрипт -->
+    <script src="~/lib/angular.min.js"> </script>
+    <!--2) подключили SignalR-->
+    <script src="~/js/signalr/dist/browser/signalr.js"> </script>
+</head>
+
+<!-- 6) крепим контроллер к представлению "View" -->
+<body>
+    
+    <h5> @ViewData["Title"] </h5>
+
+    <div ng-controller="mainController">
+        @RenderBody()
+    </div>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>

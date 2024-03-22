@@ -1,0 +1,70 @@
+﻿@model ProjectAspEShop2024.Models.RoleViewModel
+
+@{
+    ViewData["Title"] = "Редактирование Роли";
+}
+
+<h4>@ViewData["Title"] </h4>
+<hr />
+<div class="row">
+    <div class="col-md-12">
+        <form asp-action="RoleEditView">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Id" class="control-label"></label>
+                <input readonly asp-for="Id" class="form-control" />
+                <span asp-validation-for="Id" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input readonly asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <table class="table table-hover table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Permission</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.RoleClaims.Count; i++)
+                        {
+                            <tr>
+                                <td>
+                                    <input asp-for="@Model.RoleClaims[i].Type" type="hidden" />
+                                    @Model.RoleClaims[i].Type
+                                </td>
+                                <td>
+                                    <input asp-for="@Model.RoleClaims[i].Value" type="hidden" />
+                                    @Model.RoleClaims[i].Value
+                                </td>
+                                <td>
+                                    <div class="form-check m-1">
+                                        <input asp-for="@Model.RoleClaims[i].Selected" class="form-check-input" />
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Сохранить" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

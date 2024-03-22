@@ -1,0 +1,29 @@
+﻿
+@{
+    ViewData["Title"] = "Управление контентом";
+
+    var request = Context.Request;
+    string? currentUrl = $"{request.Path}{request.QueryString}";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="list-group">
+    <a asp-controller="ContentManager"
+       asp-action="AddProductView"
+       asp-route-returnUrl="@currentUrl"
+       class="list-group-item list-group-item-action">
+        Добавить товар
+    </a>
+    <a asp-controller="ContentManager"
+       asp-action="EditCategoriesView"
+       class="list-group-item list-group-item-action">
+        Редактировать категории
+    </a>
+    
+    <a asp-controller="ContentManager"
+       asp-action="UploadFileDocumentsView"
+       class="list-group-item list-group-item-action">
+        Загрузка документов
+    </a>
+</div>

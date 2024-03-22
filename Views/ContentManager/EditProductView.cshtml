@@ -1,0 +1,126 @@
+﻿@using System.Security.Claims
+@using ProjectAspEShop2024.AppIdentity
+@model ProjectAspEShop2024.Models.ProductEditViewModel
+
+@{
+    ViewData["Title"] = "Редактирование товара";
+}
+
+<h4>@ViewData["Title"]</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="EditProductView" asp-controller="ContentManager" enctype="multipart/form-data">
+            @Html.HiddenFor(model => model.ReturnUrl)
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="ProductId" class="control-label"></label>
+                <input readonly asp-for="ProductId" class="form-control" />
+                <span asp-validation-for="ProductId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            @if (User.CanEditPrice())
+            {
+                <div class="form-group">
+                    <label asp-for="Price" class="control-label"></label>
+                    <input asp-for="Price" class="form-control" />
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div>
+            }
+
+            <div class="form-group">
+                <label asp-for="Quantity" class="control-label"></label>
+                <input asp-for="Quantity" class="form-control" />
+                <span asp-validation-for="Quantity" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="PhotoUrl" class="control-label"></label>
+                <input readonly asp-for="PhotoUrl" class="form-control" />
+                <span asp-validation-for="PhotoUrl" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+
+                <img 
+                    id="ProductImage" 
+                    width="200" height="200"
+                    src="~/ProductImages/@Model.PhotoUrl" />
+
+                <label>Загрузка картники</label>
+                <input type="file" data-val="false" asp-for="ImageFile" accept="image/*"/>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <!-- Выбор категории -->
+                <label>
+                    @Html.DisplayNameFor(m => m.CategoryId)
+                </label>
+                <div style="margin:10px;">
+                    <select asp-items="@Model.CategoriesList"
+                            asp-for="@Model.CategoryId">
+                    </select>
+                </div>
+
+            </div>
+            <div class="form-group">
+                <!-- Выбор бренда -->
+                <label>
+                    @Html.DisplayNameFor(m => m.BrandId)
+                </label>
+                <div style="margin:10px;">
+                    <select asp-items="@Model.BrandsList"
+                            asp-for="@Model.BrandId">
+                    </select>
+                </div>
+
+            </div>
+            <div class="form-group">
+
+                <input type="submit" value="Сохранить" class="btn btn-success" />
+
+                <a class="btn btn-primary" href="@Model.ReturnUrl">
+                    Отмена
+                </a>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        // Отображение новой картинки в режиме реального времени
+
+        $('#ImageFile').change(function () {
+            LoadImage(this);
+        });
+
+        function LoadImage(input){
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('#ProductImage').attr('src', e.target.result)
+                }
+
+                reader.readAsDataURL( input.files[0] );
+            }
+        }
+
+    </script>
+}

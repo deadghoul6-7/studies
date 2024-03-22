@@ -1,0 +1,188 @@
+﻿@{
+	ViewData["Title"] = "MaterialChatManagerView";
+	Layout = "~/Views/Shared/_LayoutMaterialChat.cshtml";
+}
+
+<div class="row">
+	<h4>Chat with '{{currentUser}}' </h4>
+	<hr class="grey" />
+
+	<div>
+		<div class="col s12 m3 l3">
+			<!-- СПИСОК ЮЗЕРОВ в ЧАТЕ -->
+			<ul class="collection">
+				
+				<li ng-repeat="userName in Users track by $index"
+					ng-click="btnUserClick(userName)"
+					class="collection-item avatar">
+					<i ng-class="getUserClass(userName)"></i>
+					<span class="title">{{userName}}</span>
+					<p>
+						online <br>
+					</p>
+				</li>
+			</ul>
+		</div>
+
+		<div class="col s12 m9 l9">
+
+		<div ng-repeat="message in allMessages track by $index">
+			<!-- от текущего юзера-->
+			<div 
+				ng-if="message.receiver == 'manager' && message.sender == currentUser"
+				class="row left-align" >
+
+				<div class="col s12 m8 l6 left">
+
+					<div class="row valign-wrapper">
+						<div class="col s2" style="margin-top:-22px; margin-right:-10px;">
+							<img src="https://lh5.googleusercontent.com/-d6V2Y2HV0FU/AAAAAAAAAAI/AAAAAAAAACA/iuRJhY_1XPs/s96-c/photo.jpg" height="100" width="" alt="100" class="circle responsive-img"> <!-- notice the "circle" class -->
+						</div>
+						<div class="chat-field red">
+							<span class="chat-message white-text">
+								{{message.text}}
+							</span>
+							<div class="example"></div>
+						</div>
+					</div>
+
+				</div>
+			</div>
+
+			<!-- НАШИ -->
+			<div 
+				class="row right-align" 
+				ng-if="message.sender == 'manager' && message.receiver == currentUser">
+
+				<div class="col s12 m8 l6 right">
+					<div class="row valign-wrapper">
+						<div class="chat-field2 grey">
+							<span class="chat-message white-text">
+								{{message.text}}
+							</span>
+							<div class="example2"></div>
+						</div>
+						<div class="col s2" style="margin-top:-22px; margin-right:-10px;">
+							<img src="https://lh5.googleusercontent.com/-d6V2Y2HV0FU/AAAAAAAAAAI/AAAAAAAAACA/iuRJhY_1XPs/s96-c/photo.jpg" height="100" width="" alt="100" class="circle responsive-img"> <!-- notice the "circle" class -->
+						</div>
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+	</div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col s12">
+		<div class="input-field col s9">
+			<input ng-model="currentMessage"
+				   placeholder="введите сообщение"
+				   id="first_name" type="text"
+				   class="validate">
+		</div>
+		<div class="input-field col s3">
+			<button ng-click="btnSendClick()"
+					class="btn waves-effect waves-light btn-small indigo btn-block"
+					type="button">
+				<i class="material-icons white-text">
+					Отправить
+				</i>
+			</button>
+		</div>
+	</div>
+</div>
+
+
+@section Scripts {
+
+	<script>
+		var mainApp = angular.module("mainApp", []);
+
+		// 5) добавляем контроллер (м/б много)
+		// $ - встроенные переменные ангуляр
+		mainApp.controller("mainController", function ($scope, $http, $timeout) {
+
+			var connection = new signalR.HubConnectionBuilder()
+				.withUrl("/chatManager")
+				.build();
+
+			$scope.allMessages = [];
+			$scope.Receiver = "";
+			$scope.Users = [];
+
+			connection.on("ReceiveMessage", function (user, message) {
+				console.log(`from user= ${user} got msg= ${message}`);
+
+				$scope.$apply(function () {
+					$scope.Receiver = user;
+					$scope.currentUser = user;
+
+					var obj =
+					{
+						'sender': user,
+						'receiver': 'manager',
+						'text': message
+					};
+
+					if (!$scope.Users.includes()) {
+						$scope.Users.push(user);
+					}
+
+					$scope.allMessages.push(obj);
+				});
+			});
+
+			connection.start().then(function () {
+				console.log("got connection");
+			}).catch(function (err) {
+				return console.error(err.toString());
+			});
+
+			$scope.currentMessage = "";
+			$scope.currentUser = "";
+
+			$scope.btnSendClick = function () {
+				var obj = 
+				{ 
+					'sender': 'manager',
+					'receiver': $scope.Receiver,
+					'text': $scope.currentMessage 
+				};
+				console.log(`Receiver = ${$scope.Receiver}, msg= ${$scope.currentMessage}`);
+				// SendMessage - название метода на сервере в Хабе
+				connection
+					.invoke("SendMessage",
+						$scope.Receiver,
+						$scope.currentMessage)
+					.catch(function (err) {
+						return console.error(err.toString());
+					});
+
+				$scope.allMessages.push(obj);
+				$scope.currentMessage = "";
+			}
+
+			$scope.btnUserClick = function(userName){
+				$scope.currentUser = userName;
+				$scope.Receiver = userName;
+			}
+			
+			$scope.getUserClass = function (userName) {
+				var classString = "material-icons circle";
+
+				if (userName == $scope.currentUser) {
+					classString += " green";
+				}
+
+				return classString;
+			}
+		});
+
+	</script>
+
+}
+

@@ -1,0 +1,43 @@
+﻿@model List<ProjectAspEShop2024.Models.BrandCheck>
+
+@{
+    var request = Context.Request;
+    string? currentUrl = $"{request.Path}{request.QueryString}";
+}
+
+<label>Бренды:</label>
+<form 
+    method="post"
+    asp-controller="Product"
+    asp-route-returnUrl="@currentUrl"
+    asp-action="FilterForListBrand">
+    <div class="btn-group btn-group-sm" role="group">
+        @for (var index = 0; index < @Model.Count(); index++)
+        {
+            <input 
+                type="checkbox" 
+                class="btn-check" 
+                asp-for="@Model[index].IsChecked" 
+                 />
+            <label 
+                class="btn btn-outline-primary" 
+                asp-for="@Model[index].IsChecked">
+                @Model[index].BrandName
+            </label>
+            <input type="hidden" asp-for="@Model[index].BrandId" />
+            <input type="hidden" asp-for="@Model[index].BrandName" />
+        }
+    </div>
+    <div>
+        <input class="btn btn-primary mt-3" type="submit" value="Применить" />
+
+        <a 
+            asp-action="ResetBrandsFilter"
+            asp-route-returnUrl="@currentUrl"
+            asp-controller="Product"
+           class="btn btn-danger mt-3">
+            Сбросить фильтр по брендам
+        </a>
+
+    </div>
+</form>

@@ -1,0 +1,83 @@
+﻿@{
+    Layout = "_LayoutVue";
+}
+
+<a asp-controller="Home" asp-action="Index">
+    Home
+</a>
+
+<div id="app">
+    {{message}}
+</div>
+
+<div id="cartDiv">
+    <button v-on:click="btnLoadClick">
+        Load Cart
+    </button>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>название</th>
+                <th>цена</th>
+                <th>количество</th>
+                <th>стоимость</th>
+                <th>изменить</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr v-for="pos in cart.positions">
+                <td>{{pos.product.productId}}</td>
+                <td>{{pos.product.name}}</td>
+                <td>{{pos.product.price}} (руб)</td>
+                <td>{{pos.quantity}}</td>
+                <td>{{pos.cost}} (руб) </td>
+                <td>
+                    <button v-on:click="btnChangeClick(pos, '+')">
+                        +
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
+@section Scripts {
+
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data:{
+                message:'Привет, работает Vue.JS (v2)'
+            }
+        });
+
+        var cartDiv = new Vue({
+            el:'#cartDiv',
+            data:{
+                counter:0,
+                cart:{}
+            },
+            methods:{
+                btnChangeClick(pos, sign){
+                    console.log(sign);
+                    console.log(pos);
+                },
+
+                btnLoadClick(){
+                    fetch('/api/GetCart', {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                        },
+                    })
+                       .then(response => response.json())
+                       .then(x => this.cart = x);
+                }
+            }
+        });
+    </script>
+}

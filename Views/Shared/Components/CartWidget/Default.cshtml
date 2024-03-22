@@ -1,0 +1,29 @@
+﻿@model ProjectAspEShop2024.BusinesLogic.Cart
+
+@{
+    var request = Context.Request;
+    string? currentUrl = $"{request.Path}{request.QueryString}";
+}
+
+<div 
+    class="float-right" 
+    style="margin-right:30px;margin-top:10px;white-space:nowrap">
+    <a 
+        asp-controller="Cart"
+        asp-action="CartView"
+        asp-route-returnUrl="@currentUrl"
+        class="position-relative btn btn-light">
+        <i class="bi bi-cart">
+
+        </i> 
+        @if (Model != null && Model.ProductCount > 0)
+        {
+            @Model.TotalCost.ToString("c")
+            <span 
+            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                @Model.ProductCount
+            </span>
+        }
+    </a>
+</div>
+

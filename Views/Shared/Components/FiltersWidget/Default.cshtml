@@ -1,0 +1,91 @@
+﻿@model ProjectAspEShop2024.Models.FilterProductViewModel
+
+@{
+	var request = Context.Request;
+	string? currentUrl = $"{request.Path}{request.QueryString}";
+}
+
+<div style="width:300px;margin-top:20px;">
+
+	<!-- Кнопка управления Коллапсом -->
+	<button 
+		class="btn btn-primary" 
+		type="button" 
+		data-bs-toggle="collapse" 
+		data-bs-target="#collapseExample" 
+		aria-expanded="false" 
+		aria-controls="collapseExample">
+		ФИЛЬТРЫ
+	</button>
+    
+	<div class="collapse" id="collapseExample">
+		<form 
+			method="post"
+			asp-controller="Product" 
+			asp-action="ChangeFilter"
+			asp-route-returnUrl="@currentUrl"
+		>
+			<!-- Выбор бренда -->
+			<label>
+				@Html.DisplayNameFor(m => m.BrandId)
+			</label>
+			<div style="margin:10px;">
+				<select 
+					asp-items="@Model.BrandsList"
+					asp-for="@Model.BrandId">
+				</select>
+			</div>
+
+			<!-- Фильтр по цене -->
+			<button 
+				class="btn btn-primary" 
+				type="button" 
+				data-bs-toggle="collapse" 
+				data-bs-target="#collapsePrice" 
+				aria-expanded="false" 
+				>
+				По цене
+			</button>
+			<div id="collapsePrice" 
+				class="collapse card card-body">
+				<label>По цене:</label>
+				<label>
+					Макс цена: @Model.MaxPriceEdge.ToString("c") 
+				</label>
+
+				<input id="minPrice" name="MinPrice" value="@Model.MinPrice"/>
+
+				<input id="maxPrice" name="MaxPrice" value="@Model.MaxPrice" />
+
+				<input
+					id="priceSlider"
+					type="text"
+					name="priceSlider"
+				
+					data-slider-min="0"
+					data-slider-max="@Model.MaxPriceEdge"
+					data-slider-step="1000"
+					data-slider-value="[@Model.MinPrice, @Model.MaxPrice]"
+				>
+			</div>
+
+			<!-- Кнопка Применить -->
+			<div>
+				<button id="buttonApplyFilter"
+						class="btn btn-success"
+						type="submit">
+					Применить
+				</button>
+			</div>
+
+		</form>
+
+	</div>
+
+	
+	
+</div>
+
+<!--
+	data-provide="slider"
+-->

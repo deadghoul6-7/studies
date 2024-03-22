@@ -1,0 +1,146 @@
+﻿@{
+    Layout = "_LayoutAngular";
+}
+
+<a asp-controller="Home" asp-action="Index">
+    Home
+</a>
+
+<button ng-click="btnLoadClick()">
+    Обновить корзину с сервера
+</button>
+
+<div ng-hide="isDataLoaded">
+    <img src="~/images/loader.gif"
+         width="50px" height="50px" />
+</div>
+
+<div>
+    <input type="text" />
+</div>
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>id</th>
+            <th>название</th>
+            <th>цена</th>
+            <th>количество</th>
+            <th>стоимость</th>
+            <th>изменить</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <tr ng-repeat="pos in cart.positions">
+            <td>{{pos.product.productId}}</td>
+            <td>{{pos.product.name}}</td>
+            <td>{{pos.product.price | currency : ""}} (руб)</td>
+            <td>{{pos.quantity | number}}</td>
+            <td>{{pos.cost | currency : ""}} (руб) </td>
+            <td>
+                <button ng-click="btnModifyClick('+', pos)">
+                    +
+                </button>
+                <button ng-click="btnModifyClick('x', pos)">
+                    x
+                </button>
+                <button ng-click="btnModifyClick('-', pos)">
+                    -
+                </button>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<button ng-click="btnSendClick()">
+    Send to Server
+</button>
+
+@section Scripts {
+
+    <script>
+        // 3) AngularJS - MVC
+
+        // модель данных
+        var model = [];
+
+        // 4) описываем Главный Модуль - точка входа
+        // [] - модуль создаётся, если есть параметры - поиск модуля
+        var mainApp = angular.module("mainApp", []);
+
+        // 5) добавляем контроллер (м/б много)
+        // $ - встроенные переменные ангуляр
+        mainApp.controller("mainController", function ($scope, $http, $timeout) {
+            $scope.isDataLoaded = true;
+
+            $scope.btnLoadClick = function () {
+                $scope.cart = {};
+                // включаем "крутилку"
+                $scope.isDataLoaded = false;
+                $http({
+                    method: 'GET',
+                    url: '/api/GetCart'
+                }).then(function successCallback(response) {
+
+                    $timeout(function () {
+                        $scope.isDataLoaded = true;
+                        console.log(response);
+                        $scope.cart = response.data;
+                    }, 500);
+
+                }, function errorCallback(response) {
+                    console.log(response);
+                });
+
+            }
+
+            function updateCart(pos) {
+                if (pos.quantity <= 0) {
+
+                    const index = $scope.cart.positions.indexOf(pos);
+                    if (index > -1) {
+                        $scope.cart.positions.splice(index, 1);
+                    }
+                } else {
+                    pos.cost = pos.product.price * pos.quantity;
+                }
+            }
+
+            $scope.btnModifyClick = function (ch, pos) {
+                /*console.log(ch);
+                console.log(pos);*/
+                switch (ch) {
+                    case '+':
+                        pos.quantity++;
+                        updateCart(pos);
+                        break;
+                    case '-':
+                        pos.quantity--;
+                        updateCart(pos);
+                        break;
+                    case 'x':
+                        pos.quantity = 0;
+                        updateCart(pos);
+                        break;
+                }
+            }
+
+            $scope.btnSendClick = function () {
+                $http.post('/api/PostCart', $scope.cart)
+                  .then(
+                    function(response) {
+                      // success callback
+                      console.log("Sent Successfully!")
+                    },
+                    function(response) {
+                      // failure call back
+                       console.log("Error while sending")
+                    });
+            }
+
+        });
+
+    </script>
+
+}

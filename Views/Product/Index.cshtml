@@ -1,0 +1,191 @@
+﻿@using ProjectAspEShop2024.Filters;
+@using ProjectAspEShop2024.Helpers
+@model ProjectAspEShop2024.Models.ProductsPageViewModel
+
+@{
+    ViewData["Title"] = 
+        $"Список товаров '{Model.ActiveCategory}' ({Model.PageQuantity})стр.";
+
+    var request = Context.Request;
+    string? currentUrl = $"{request.Path}{request.QueryString}";
+}
+
+<h1> @ViewData["Title"] </h1>
+
+<div style="margin:10px;">
+    @await Component.InvokeAsync("BrandsCheck")
+</div>
+
+<!-- Поисковая форма -->
+<form 
+      method="post"
+      asp-action="FilterProductByName"
+      asp-controller="Product"
+      asp-route-returnUrl="@currentUrl">
+
+    <div class="input-group mb-3">  
+            <a 
+                class="btn btn-outline-danger"
+                asp-controller="Product"
+                asp-action="ResetSearchText"
+                asp-route-returnUrl="@currentUrl"
+            >
+                x
+            </a>
+
+            <input 
+                value="@Model.Filters.SearchText"
+                name="searchText"
+                type="text" 
+                class="form-control" 
+                placeholder="поиск товара по названию..."
+                >
+            <button 
+                class="btn btn-outline-success" 
+                type="submit">
+                Поиск
+            </button>
+    </div>
+
+</form>
+
+<!-- ПРИМИТИВНО 
+<a 
+    asp-action="Index"
+    asp-controller="Product"
+    asp-route-page="1">
+    1
+</a>
+<a 
+    asp-action="Index"
+    asp-controller="Product"
+    asp-route-page="2">
+    2
+</a>
+-->
+<!-- Html.SimplePagination(Model) -->
+
+@Html.BootstrapPagination(Model)
+
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>
+                <div class="btn-group" role="group">
+                    <a 
+                        asp-controller="Product"
+                        asp-action="SwitchOnSortByName"
+                        asp-route-direction="@((int)SortType.Descending)"
+                        asp-route-returnUrl="@currentUrl"
+                        class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-down"></i>
+                    </a>
+                    <a 
+                        asp-controller="Product"
+                        asp-action="SwitchOnSortByName"
+                        asp-route-direction="@((int)SortType.None)"
+                        asp-route-returnUrl="@currentUrl"
+                        class="btn btn-outline-primary">
+                        <i class="bi bi-stop"></i>
+                    </a>
+                    <a 
+                        asp-controller="Product"
+                        asp-action="SwitchOnSortByName"
+                        asp-route-direction="@((int)SortType.Ascending)"
+                        asp-route-returnUrl="@currentUrl"
+                        class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-up"></i>
+                    </a>
+                </div>
+
+                @Html.DisplayNameFor(model => model.Products.First().Name)
+            </th>
+            <th>
+                <div class="btn-group" role="group">
+                    <a asp-controller="Product"
+                       asp-action="SwitchOnSortByPrice"
+                       asp-route-direction="@((int)SortType.Descending)"
+                       asp-route-returnUrl="@currentUrl"
+                       class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-down"></i>
+                    </a>
+                    <a asp-controller="Product"
+                       asp-action="SwitchOnSortByPrice"
+                       asp-route-direction="@((int)SortType.None)"
+                       asp-route-returnUrl="@currentUrl"
+                       class="btn btn-outline-primary">
+                        <i class="bi bi-stop"></i>
+                    </a>
+                    <a asp-controller="Product"
+                       asp-action="SwitchOnSortByPrice"
+                       asp-route-direction="@((int)SortType.Ascending)"
+                       asp-route-returnUrl="@currentUrl"
+                       class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-up"></i>
+                    </a>
+                </div>
+
+                @Html.DisplayNameFor(model => model.Products.First().Price)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Products) 
+{
+        <tr>
+            <td>
+                <a 
+                    asp-controller="Product"
+                    asp-action="DetailsView"
+                    asp-route-productId="@item.ProductId"
+                    asp-route-returnUrl="@currentUrl"
+                >
+                    @Html.DisplayFor(modelItem => item.Name)
+                </a>
+            </td>
+            <td>
+                <div>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </div>
+                <div>
+                    @if(User.IsInRole("content_manager"))
+                    {
+                        <div class="btn-group" role="group">
+                            <a 
+                                asp-controller="ContentManager"
+                                asp-action="EditProductView"
+                                asp-route-productId="@item.ProductId"
+                                asp-route-returnUrl="@currentUrl"
+                                class="btn btn-outline-primary">
+                                Редактировать
+                            </a>
+                            <a asp-controller="ContentManager"
+                                asp-action="DeleteProduct"
+                                asp-route-productId="@item.ProductId"
+                                asp-route-returnUrl="@currentUrl"
+                                class="btn btn-outline-danger">
+                                x
+                            </a>
+                        </div>
+                    } else
+                    {
+                        <a 
+                            asp-controller="Cart"
+                            asp-action="AddToCart"
+                            asp-route-productId="@item.ProductId"
+                            asp-route-returnUrl="@currentUrl"
+                            class="btn btn-success">
+                            Купить
+                        </a>
+                    }
+                </div>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+<Pagination
+    ActiveCategory="@Model.ActiveCategory"
+    TotalPages = "@Model.PageQuantity"
+    ActivePage = "@Model.ActivePage" />

@@ -1,0 +1,56 @@
+﻿@model List<ProjectAspEShop2024.Models.CategoryViewModel>
+
+@{
+    ViewData["Title"] = "Редактирование категорий";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>
+    <a class="btn btn-primary"
+       asp-action="CreateCategory">
+      Добавить
+    </a>
+</p>
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.First().CategoryId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.First().Name)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.CategoryId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                <div class="btn-group" role="group">    
+
+                    <a class="btn btn-outline-success"
+                       asp-action="EditCategoryView"
+                       asp-route-categoryId="@item.CategoryId">
+                        Edit
+                    </a>
+
+                    <a class="btn btn-outline-danger"
+                       asp-action="DeleteCategory"
+                       asp-route-categoryId="@item.CategoryId">
+                        x
+                    </a>
+
+                </div>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

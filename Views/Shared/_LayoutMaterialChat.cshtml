@@ -1,0 +1,64 @@
+﻿<!doctype html>
+<html lang="ru" ng-app="mainApp">
+
+<head>
+	<title>Material Chat</title>
+	<meta charset="utf-8">
+	<meta lang="ru">
+	<link rel="stylesheet" type="text/css" href="~/MaterialChatCss/materialize.min.css">
+	<link rel="stylesheet" type="text/css" href="~/MaterialChatCss/fonts.css">
+	<link rel="stylesheet" type="text/css" href="~/MaterialChatCss/style.css">
+
+	<!-- 1) подключ 1 скрипт -->
+	<script src="~/lib/angular.min.js"> </script>
+	<!--2) подключили SignalR-->
+	<script src="~/js/signalr/dist/browser/signalr.js"> </script>
+
+</head>
+
+<body>
+	<header>
+		<nav>
+			<div class="nav-wrapper">
+				<a href="#!" class="brand-logo">Materialize Chat View</a>
+			</div>
+		</nav>
+	</header>
+
+	<div class="container" ng-controller="mainController">
+		@RenderBody()
+	</div>
+
+
+	<footer class="page-footer">
+		<div class="container">
+			<div class="row">
+				<div class="col l6 s12">
+					<h5 class="white-text">About </h5>
+					<p class="grey-text text-lighten-4">Some contents here.</p>
+				</div>
+				<div class="col l4 offset-l2 s12">
+					<h5 class="white-text">Quick Links</h5>
+					<ul>
+						<li><a class="grey-text text-lighten-3" href="#!">How it works</a></li>
+						<li><a class="grey-text text-lighten-3" href="#!">Faqs</a></li>
+						<li><a class="grey-text text-lighten-3" href="#!">Contact</a></li>
+						<li><a class="grey-text text-lighten-3" href="#!">Privacy</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="footer-copyright">
+			<div class="container">
+				© 2017 Copyright
+				<a class="grey-text text-lighten-4 right" href="#!">Developed by Me </a>
+			</div>
+		</div>
+	</footer>
+
+	<script type="text/javascript" src="~/MaterialChatCss/jquery.min.js"></script>
+	<script type="text/javascript" src="~/MaterialChatCss/materialize.min.js"></script>
+
+	@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

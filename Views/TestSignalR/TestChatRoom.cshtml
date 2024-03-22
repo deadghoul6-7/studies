@@ -1,0 +1,76 @@
+﻿@{
+    Layout = "_LayoutAngular";
+}
+
+<h1>Test SignalR and AngularJS</h1>
+
+<div>
+    <input type="text" ng-model="currentUser"
+           placeholder="input userName" />
+
+    <input 
+        type="text" ng-model="currentMessage" 
+        placeholder="input message"/>
+    
+    <button ng-click="btnSendClick()">
+        Send
+    </button>
+</div>
+
+<div>
+    <h4>Все сообщения от сервера:</h4>
+    <ul>
+        <li ng-repeat="m in allMessages track by $index">
+            {{m}}
+        </li>
+    </ul>
+</div>
+
+
+
+@section Scripts {
+
+    <script>
+        var mainApp = angular.module("mainApp", []);
+
+        // 5) добавляем контроллер (м/б много)
+        // $ - встроенные переменные ангуляр
+        mainApp.controller("mainController", function ($scope, $http, $timeout) {
+
+            var connection = new signalR.HubConnectionBuilder()
+                .withUrl("/chatRoom")
+            .build();
+
+            $scope.allMessages = [];
+
+            connection.on("ReceiveMessage", function (user, message) {
+                var text = `${user} says ${message}`;
+                $scope.allMessages.push(text);
+                $scope.$apply();
+            });
+
+            connection.start().then(function () {
+                console.log("got connection");
+            }).catch(function (err) {
+                return console.error(err.toString());
+            });
+
+            $scope.currentMessage = "";
+            $scope.currentUser = "";
+
+            $scope.btnSendClick = function(){
+                // SendMessage - название метода на сервере в Хабе
+                connection
+                .invoke("SendMessage", 
+                    $scope.currentUser, 
+                    $scope.currentMessage)
+                .catch(function (err) {
+                    return console.error(err.toString());
+                });
+                $scope.currentMessage = "";
+            }
+        });
+
+    </script>
+
+}
